@@ -15,8 +15,10 @@ int main(int argc, char* argv[])
 	int socket_desc, client_sock, c, read_size;
 	struct sockaddr_in server, client;
 	char reply[100];
+	size_t buf_size;
 
 	char* client_message = malloc(1024 * 1024 * sizeof(char) + 1);
+	char* signal  = malloc(100 * sizeof(char) + 1);
 
 	//Create socket
 	socket_desc = socket(AF_INET, SOCK_STREAM, 0);
@@ -57,29 +59,30 @@ int main(int argc, char* argv[])
 	}
 	puts("Connection accepted");
 
-	//Receive a message from client
-	while ((read_size = recv(client_sock, client_message, 1000000000, 0)) > 0)
+	//Receive a signal from client
+	while ((read_size = recv(client_sock, signal, 100, 0)) > 0)
 	{
+		//Check signal
+		sscanf(signal, "%zu", &buf_size);
+		printf("Starting message size: %zu\n", buf_size);
+
+		//Receive 1100 times
+		for (int i = 0; i < 1100; i++) {
+			int remaining = buf_size;
+			read_size = 0;
+			while (remaining > 0) {
+				read_size += recv(client_sock, client_message + read_size, buf_size - read_size, 0);
+				remaining -= read_size;
+			}
+		}
+		
 		//Send the message back to client
-		size_t msg_len = strlen(client_message);
-		snprintf(reply, sizeof reply, "%zu", msg_len);
-		puts(reply);
+		reply = "OK";
 		send(client_sock, reply, strlen(reply) + 1, 0);
 	}
-
-	if (read_size == 0)
+	if (read_size == -1)
 	{
-		puts("Client disconnected");
-		fflush(stdout);
-	}
-	else if (read_size == -1)
-	{
-		if (errno == EWOULDBLOCK) {
-			// OK. Simply no data
-		}
-		else {
-			perror("recv failed");
-		}
+		perror("recv failed");
 	}
 
 	return 0;

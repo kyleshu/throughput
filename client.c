@@ -7,6 +7,8 @@
 #include <sys/socket.h>	//socket
 #include <arpa/inet.h>	//inet_addr
 #include <unistd.h>
+#include <sys/time.h>
+
 
 static char* rand_string(char* str, size_t size)
 {
@@ -23,8 +25,9 @@ static char* rand_string(char* str, size_t size)
 
 int main(int argc, char* argv[])
 {
-	int sock, send_size;
+	int sock, send_size, recv_size;
 	struct sockaddr_in server;
+	struct timeval stop, start;
 	char message[1024*1024+1], server_reply[100], signal[100];
 	size_t msg_len;
 
@@ -66,23 +69,37 @@ int main(int argc, char* argv[])
 		printf("The length of message : %zu\n", strlen(message));
 
 		//Notify test begins
+		sprintf(signal, "%zu", msg_len);
+		send(sock, signal, strlen(signal) + 1, 0);
 
-
-		//Keep sending data
-		if ((send_size = send(sock, message, strlen(message) + 1, 0)) < 0)
-		{
-			puts("Send failed");
-			return -1;
-		} 
-		printf("Sent size of message : %i\n", send_size);
+		//Keep sending data for 1100 times, 100 for warming up, 1000 for benchmarking
+		for (int i = 0; i < 100; i++) {
+			if ((send_size = send(sock, message, msg_len, 0)) < 0)
+			{
+				puts("Send failed");
+				return -1;
+			}
+			printf("Sent %ith pre-test message, size: %i\n", i, send_size);
+		}
+		gettimeofday(&start, NULL);
+		for (int i = 0; i < 1000; i++) {
+			if ((send_size = send(sock, message, msg_len, 0)) < 0)
+			{
+				puts("Send failed");
+				return -1;
+			}
+			printf("Sent %ith message, size: %i\n", i, send_size);
+		}
 
 		//Receive a reply from the server
-		if (recv(sock, server_reply, 2000, 0) < 0)
-		{
+		recv_size = recv(sock, server_reply, 100, 0);
+		if (recv_size == -1) {
 			puts("recv failed");
-			break;
 		}
-		//puts(server_reply);
+		if (strcmp(server_reply, "OK") == 0) {
+			gettimeofday(&stop, NULL);
+			printf("took %lu ms\n", (stop.tv_sec - start.tv_sec) * 1000 + (stop.tv_usec - start.tv_usec) / 1000);
+		}
 	}
 
 	close(sock);
