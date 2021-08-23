@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
 	int socket_desc, client_sock, c, read_size;
 	struct sockaddr_in server, client;
-	char reply[100];
+	char reply[100] = "OK";
 	size_t buf_size;
 
 	char* client_message = malloc(1024 * 1024 * sizeof(char) + 1);
@@ -77,7 +77,6 @@ int main(int argc, char* argv[])
 		}
 		
 		//Send the message back to client
-		reply = "OK";
 		send(client_sock, reply, strlen(reply) + 1, 0);
 	}
 	if (read_size == -1)
