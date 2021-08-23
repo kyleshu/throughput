@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
 	//Receive a signal from client
 	//while ((read_size = recv(client_sock, signal, 100, 0)) > 0)
-	for (buf_size = 1; buf_size < 1024 * 1024 + 1; buf_size = buf_size * 2) 
+	for (buf_size = 1; buf_size < 3; buf_size = buf_size * 2) 
 	{
 		//Check signal
 		//sscanf(signal, "%zu", &buf_size);
@@ -73,8 +73,8 @@ int main(int argc, char* argv[])
 		while (remaining > 0) {
 			read_size += recv(client_sock, client_message + read_size, buf_size, 0);
 			remaining -= read_size;
-			//printf("Remaining size: %i\n", remaining);
-			//printf("Read size: %i\n", read_size);
+			printf("Remaining size: %i\n", remaining);
+			printf("Read size: %i\n", read_size);
 		}
 		puts("Processed 1100 messages");
 		
