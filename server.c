@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
 	//Receive a signal from client
 	//while ((read_size = recv(client_sock, signal, 100, 0)) > 0)
-	for (buf_size = 1; buf_size < 1024 * 1024 + 1; buf_size = buf_size * 2) {
+	for (buf_size = 1; buf_size < 1024 * 1024 + 1; buf_size = buf_size * 2) 
 	{
 		//Check signal
 		//sscanf(signal, "%zu", &buf_size);
