@@ -69,8 +69,8 @@ int main(int argc, char* argv[])
 		printf("The length of message : %zu\n", strlen(message));
 
 		//Notify test begins
-		//sprintf(signal, "%zu", msg_len);
-		//send(sock, signal, strlen(signal) + 1, 0);
+		sprintf(signal, "%zu", msg_len);
+		send(sock, signal, strlen(signal) + 1, 0);
 
 		//Keep sending data for 1100 times, 100 for warming up, 1000 for benchmarking
 		for (int i = 0; i < 100; i++) {
