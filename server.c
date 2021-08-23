@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
 		sscanf(signal, "%zu", &buf_size);
 		printf("Starting message size: %zu\n", buf_size);
 
-		//Receive 1100 times
+		//Receive 20200 copies of data
 		int remaining = buf_size * 20200;
 		char* p = client_message;
 		while (remaining > 0) {
