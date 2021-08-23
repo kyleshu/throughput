@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
 				remaining -= read_size;
 			}
 		}
+		puts("Processed 1100 messages");
 		
 		//Send the message back to client
 		send(client_sock, reply, strlen(reply) + 1, 0);
