@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 	puts("Connected\n");
 
 	//Start sending data to server
-	for (msg_len = 1024*1024; msg_len < 1024 * 1024 + 1; msg_len = msg_len * 2) {
+	for (msg_len = 1; msg_len < 1024 * 1024 + 1; msg_len = msg_len * 2) {
 		//Prepare dummy string
 		rand_string(message, msg_len - 1);
 		printf("The length of message : %zu\n", strlen(message));

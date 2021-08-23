@@ -70,10 +70,10 @@ int main(int argc, char* argv[])
 		int remaining = buf_size * 1100;
 		read_size = 0;
 		while (remaining > 0) {
-			read_size += recv(client_sock, client_message + read_size, remaining, 0);
+			read_size += recv(client_sock, client_message + read_size, buf_size, 0);
 			remaining -= read_size;
-			printf("Remaining size: %i\n", remaining);
-			printf("Read size: %i\n", read_size);
+			//printf("Remaining size: %i\n", remaining);
+			//printf("Read size: %i\n", read_size);
 		}
 		puts("Processed 1100 messages");
 		
