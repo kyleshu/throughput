@@ -60,10 +60,11 @@ int main(int argc, char* argv[])
 	puts("Connection accepted");
 
 	//Receive a signal from client
-	while ((read_size = recv(client_sock, signal, 100, 0)) > 0)
+	//while ((read_size = recv(client_sock, signal, 100, 0)) > 0)
+	for (buf_size = 1; buf_size < 1024 * 1024 + 1; buf_size = buf_size * 2) {
 	{
 		//Check signal
-		sscanf(signal, "%zu", &buf_size);
+		//sscanf(signal, "%zu", &buf_size);
 		printf("Starting message size: %zu\n", buf_size);
 
 		//Receive 1100 times
