@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 	char reply[100] = "OK";
 	size_t buf_size;
 
-	char* client_message = malloc(1100 * (1024 * 1024 * sizeof(char) + 1));
+	char* client_message = malloc(20200 * (1024 * 1024 * sizeof(char) + 1));
 	char* signal  = malloc(100 * sizeof(char) + 1);
 
 	//Create socket
