@@ -77,6 +77,7 @@ int main(int argc, char* argv[])
 			puts("recv failed");
 			break;
 		}
+		puts(server_reply);
 	}
 
 	close(sock);
