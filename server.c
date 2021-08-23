@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 	char reply[100] = "OK";
 	size_t buf_size;
 
-	char* client_message = malloc(20200 * (1024 * 1024 * sizeof(char) + 1));
+	char* client_message = malloc(2200 * (1024 * 1024 * sizeof(char)));
 	char* signal  = malloc(100 * sizeof(char) + 1);
 
 	//Create socket
@@ -66,8 +66,8 @@ int main(int argc, char* argv[])
 		sscanf(signal, "%zu", &buf_size);
 		printf("Starting message size: %zu\n", buf_size);
 
-		//Receive 20200 copies of data
-		int remaining = buf_size * 20200;
+		//Receive 2200 copies of data
+		int remaining = buf_size * 2200;
 		char* p = client_message;
 		while (remaining > 0) {
 			read_size = recv(client_sock, p, buf_size, 0);
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 			//printf("Remaining size: %i\n", remaining);
 			//printf("Read size: %i\n", read_size);
 		}
-		puts("Processed 20200 messages");
+		puts("Processed 2200 messages");
 		
 		//Send the message back to client
 		send(client_sock, reply, strlen(reply) + 1, 0);
