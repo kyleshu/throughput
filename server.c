@@ -19,6 +19,7 @@ int main(int argc, char* argv[])
 	if (socket_desc == -1)
 	{
 		printf("Could not create socket");
+		return -1;
 	}
 	puts("Socket created");
 
@@ -32,7 +33,7 @@ int main(int argc, char* argv[])
 	{
 		//print the error message
 		perror("bind failed. Error");
-		return 1;
+		return -1;
 	}
 	puts("bind done");
 
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
 	if (client_sock < 0)
 	{
 		perror("accept failed");
-		return 1;
+		return -1;
 	}
 	puts("Connection accepted");
 

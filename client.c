@@ -23,7 +23,7 @@ static char* rand_string(char* str, size_t size)
 
 int main(int argc, char* argv[])
 {
-	int sock;
+	int sock, send_size;
 	struct sockaddr_in server;
 	char message[1024*1024+1], server_reply[100], signal[100];
 	size_t msg_len;
@@ -65,11 +65,12 @@ int main(int argc, char* argv[])
 		rand_string(message, msg_len - 1);
 		printf("The length of message : %zu", strlen(message));
 		//Send data
-		if (send(sock, message, strlen(message) + 1, 0) < 0)
+		if (send_size = send(sock, message, strlen(message) + 1, 0) < 0)
 		{
 			puts("Send failed");
-			return 1;
-		}
+			return -1;
+		} 
+		printf("Sent size of message : %i", send_size);
 
 		//Receive a reply from the server
 		if (recv(sock, server_reply, 2000, 0) < 0)
@@ -77,7 +78,7 @@ int main(int argc, char* argv[])
 			puts("recv failed");
 			break;
 		}
-		puts(server_reply);
+		//puts(server_reply);
 	}
 
 	close(sock);
