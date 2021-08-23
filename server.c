@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 			//printf("Remaining size: %i\n", remaining);
 			//printf("Read size: %i\n", read_size);
 		}
-		puts("Processed 1100 messages");
+		puts("Processed 20200 messages");
 		
 		//Send the message back to client
 		send(client_sock, reply, strlen(reply) + 1, 0);
