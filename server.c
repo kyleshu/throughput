@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 	puts("Connection accepted");
 
 	//Receive a message from client
-	while ((read_size = recv(client_sock, client_message, 1024 * 1024 + 1, 0)) > 0)
+	while ((read_size = recv(client_sock, client_message, 1000000000, 0)) > 0)
 	{
 		//Send the message back to client
 		size_t msg_len = strlen(client_message);

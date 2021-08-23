@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 			puts("Send failed");
 			return -1;
 		} 
-		printf("Sent size of message : %zu\n", send_size);
+		printf("Sent size of message : %i\n", send_size);
 
 		//Receive a reply from the server
 		if (recv(sock, server_reply, 2000, 0) < 0)
