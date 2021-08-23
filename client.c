@@ -31,9 +31,11 @@ int main(int argc, char* argv[])
 
 	if (argc > 2) {
 		printf("Too many arguments supplied.\n");
+		return -1;
 	}
 	else if (argc < 2) {
 		printf("One argument expected.\n");
+		return -1;
 	}
 
 	//Create socket
@@ -41,6 +43,7 @@ int main(int argc, char* argv[])
 	if (sock == -1)
 	{
 		printf("Could not create socket");
+		return -1;
 	}
 	puts("Socket created");
 
@@ -52,7 +55,7 @@ int main(int argc, char* argv[])
 	if (connect(sock, (struct sockaddr*)&server, sizeof(server)) < 0)
 	{
 		perror("connect failed. Error");
-		return 1;
+		return -1;
 	}
 
 	puts("Connected\n");

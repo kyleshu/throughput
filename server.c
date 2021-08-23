@@ -58,6 +58,7 @@ int main(int argc, char* argv[])
 		//Send the message back to client
 		size_t msg_len = strlen(client_message);
 		snprintf(reply, sizeof reply, "%zu", msg_len);
+		puts(reply);
 		send(client_sock, reply, strlen(reply) + 1, 0);
 	}
 
