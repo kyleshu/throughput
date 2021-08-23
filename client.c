@@ -100,6 +100,8 @@ int main(int argc, char* argv[])
 			gettimeofday(&stop, NULL);
 			printf("took %lu ms\n", (stop.tv_sec - start.tv_sec) * 1000 + (stop.tv_usec - start.tv_usec) / 1000);
 		}
+		puts("Sleep for 10 seconds");
+		sleep(10);
 	}
 
 	close(sock);

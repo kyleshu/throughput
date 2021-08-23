@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 	char reply[100] = "OK";
 	size_t buf_size;
 
-	char* client_message = malloc(1024 * 1024 * sizeof(char) + 1);
+	char* client_message = malloc(1100 * (1024 * 1024 * sizeof(char) + 1));
 	char* signal  = malloc(100 * sizeof(char) + 1);
 
 	//Create socket
@@ -67,15 +67,13 @@ int main(int argc, char* argv[])
 		printf("Starting message size: %zu\n", buf_size);
 
 		//Receive 1100 times
-		for (int i = 0; i < 1100; i++) {
-			int remaining = buf_size;
-			read_size = 0;
-			while (remaining > 0) {
-				read_size += recv(client_sock, client_message + read_size, remaining, 0);
-				remaining -= read_size;
-				printf("Remaining size: %i\n", remaining);
-				printf("Read size: %i\n", read_size);
-			}
+		int remaining = buf_size * 1100;
+		read_size = 0;
+		while (remaining > 0) {
+			read_size += recv(client_sock, client_message + read_size, remaining, 0);
+			remaining -= read_size;
+			printf("Remaining size: %i\n", remaining);
+			printf("Read size: %i\n", read_size);
 		}
 		puts("Processed 1100 messages");
 		
