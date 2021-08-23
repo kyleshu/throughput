@@ -66,14 +66,14 @@ int main(int argc, char* argv[])
 	for (msg_len = 1; msg_len < 1024 * 1024 + 1; msg_len = msg_len * 2) {
 		//Prepare dummy string
 		rand_string(message, msg_len - 1);
-		printf("The length of message : %zu\n", strlen(message));
+		printf("The length of message : %zu\n", msg_len);
 
 		//Notify test begins
 		sprintf(signal, "%zu", msg_len);
 		send(sock, signal, strlen(signal) + 1, 0);
 
-		//Keep sending data for 2200 times, 200 for warming up, 2000 for benchmarking
-		for (int i = 0; i < 200; i++) {
+		//Keep sending data for 1100 times, 100 for warming up, 1000 for benchmarking
+		for (int i = 0; i < 100; i++) {
 			if ((send_size = send(sock, message, msg_len, 0)) < 0)
 			{
 				puts("Send failed");
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 			//printf("Sent %ith pre-test message, size: %i\n", i+1, send_size);
 		}
 		gettimeofday(&start, NULL);
-		for (int i = 0; i < 2000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			if ((send_size = send(sock, message, msg_len, 0)) < 0)
 			{
 				puts("Send failed");
