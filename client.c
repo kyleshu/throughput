@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 				puts("Send failed");
 				return -1;
 			}
-			printf("Sent %ith pre-test message, size: %i\n", i+1, send_size);
+			//printf("Sent %ith pre-test message, size: %i\n", i+1, send_size);
 		}
 		gettimeofday(&start, NULL);
 		for (int i = 0; i < 1000; i++) {
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 				puts("Send failed");
 				return -1;
 			}
-			printf("Sent %ith message, size: %i\n", i+1, send_size);
+			//printf("Sent %ith message, size: %i\n", i+1, send_size);
 		}
 
 		//Receive a reply from the server
