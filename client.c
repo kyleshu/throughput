@@ -64,7 +64,11 @@ int main(int argc, char* argv[])
 		//Prepare dummy string
 		rand_string(message, msg_len - 1);
 		printf("The length of message : %zu\n", strlen(message));
-		//Send data
+
+		//Notify test begins
+
+
+		//Keep sending data
 		if ((send_size = send(sock, message, strlen(message) + 1, 0)) < 0)
 		{
 			puts("Send failed");

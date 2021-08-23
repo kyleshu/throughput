@@ -12,7 +12,9 @@ int main(int argc, char* argv[])
 {
 	int socket_desc, client_sock, c, read_size;
 	struct sockaddr_in server, client;
-	char client_message[1024*1024+1], reply[100];
+	char reply[100];
+
+	char* client_message = malloc(1024 * 1024 * sizeof(char) + 1);
 
 	//Create socket
 	socket_desc = socket(AF_INET, SOCK_STREAM, 0);
@@ -70,7 +72,12 @@ int main(int argc, char* argv[])
 	}
 	else if (read_size == -1)
 	{
-		perror("recv failed");
+		if (errno == EWOULDBLOCK) {
+			// OK. Simply no data
+		}
+		else {
+			perror("recv failed");
+		}
 	}
 
 	return 0;
