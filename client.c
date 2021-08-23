@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 		rand_string(message, msg_len - 1);
 		printf("The length of message : %zu\n", strlen(message));
 		//Send data
-		if (send_size = send(sock, message, strlen(message) + 1, 0) < 0)
+		if ((send_size = send(sock, message, strlen(message) + 1, 0)) < 0)
 		{
 			puts("Send failed");
 			return -1;
