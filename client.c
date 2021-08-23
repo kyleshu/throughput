@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 	for (msg_len = 1; msg_len < 1024 * 1024 + 1; msg_len = msg_len * 2) {
 		//Prepare dummy string
 		rand_string(message, msg_len - 1);
-		puts(strlen(message));
+		printf("The length of message : %zu", strlen(message));
 		//Send data
 		if (send(sock, message, strlen(message) + 1, 0) < 0)
 		{
