@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 		sprintf(signal, "%zu", msg_len);
 		send(sock, signal, strlen(signal) + 1, 0);
 
-		//Keep sending data for 22000 times, 200 for warming up, 20000 for benchmarking
+		//Keep sending data for 20200 times, 200 for warming up, 20000 for benchmarking
 		for (int i = 0; i < 200; i++) {
 			if ((send_size = send(sock, message, msg_len, 0)) < 0)
 			{
