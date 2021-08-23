@@ -67,9 +67,8 @@ int main(int argc, char* argv[])
 		printf("Starting message size: %zu\n", buf_size);
 
 		//Receive 1100 times
-		int remaining = buf_size * 1100;
+		int remaining = buf_size * 22000;
 		char* p = client_message;
-		read_size = 0;
 		while (remaining > 0) {
 			read_size = recv(client_sock, p, buf_size, 0);
 			remaining -= read_size;

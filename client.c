@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
 		sprintf(signal, "%zu", msg_len);
 		send(sock, signal, strlen(signal) + 1, 0);
 
-		//Keep sending data for 1100 times, 100 for warming up, 1000 for benchmarking
-		for (int i = 0; i < 100; i++) {
+		//Keep sending data for 22000 times, 200 for warming up, 20000 for benchmarking
+		for (int i = 0; i < 200; i++) {
 			if ((send_size = send(sock, message, msg_len, 0)) < 0)
 			{
 				puts("Send failed");
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 			//printf("Sent %ith pre-test message, size: %i\n", i+1, send_size);
 		}
 		gettimeofday(&start, NULL);
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 20000; i++) {
 			if ((send_size = send(sock, message, msg_len, 0)) < 0)
 			{
 				puts("Send failed");
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 			printf("took %lu ms\n", (stop.tv_sec - start.tv_sec) * 1000 + (stop.tv_usec - start.tv_usec) / 1000);
 		}
 		puts("Sleep for 10 seconds");
-		sleep(10);
+		sleep(2);
 	}
 
 	close(sock);
