@@ -827,8 +827,8 @@ int main(int argc, char *argv[])
         return 1;
 
     inet_ntop(AF_INET6, &rem_dest->gid, gid, sizeof gid);
-    printf("  remote address: LID 0x%04x, QPN 0x%06x, PSN 0x%06x, GID %s\n",
-           rem_dest->lid, rem_dest->qpn, rem_dest->psn, gid);
+    printf("  remote address: LID 0x%04x, QPN 0x%06x, PSN 0x%06x, GID %s, RKEY 0x%08x, REMOTE_ADDR 0x%016x\n",
+           rem_dest->lid, rem_dest->qpn, rem_dest->psn, gid, rem_dest->rkey, rem_dest->remote_addr);
 
     if (servername)
         if (pp_connect_ctx(ctx, ib_port, my_dest.psn, mtu, sl, rem_dest, gidx))
