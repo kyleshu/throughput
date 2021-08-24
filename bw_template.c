@@ -65,6 +65,7 @@ struct pingpong_context {
     struct ibv_context		*context;
     struct ibv_comp_channel	*channel;
     struct ibv_pd		*pd;
+    struct ibv_pd       *pd2;
     struct ibv_mr		*mr;
     struct ibv_mr       *mr2;
     struct ibv_cq		*cq;
@@ -417,13 +418,19 @@ static struct pingpong_context *pp_init_ctx(struct ibv_device *ib_dev, int size,
         return NULL;
     }
 
+    ctx->pd2 = ibv_alloc_pd(ctx->context);
+    if (!ctx->pd2) {
+        fprintf(stderr, "Couldn't allocate PD2\n");
+        return NULL;
+    }
+
     ctx->mr = ibv_reg_mr(ctx->pd, ctx->buf, size, IBV_ACCESS_LOCAL_WRITE);
     if (!ctx->mr) {
         fprintf(stderr, "Couldn't register MR\n");
         return NULL;
     }
 
-    ctx->mr2 = ibv_reg_mr(ctx->pd, ctx->buf2, size, IBV_ACCESS_REMOTE_WRITE);
+    ctx->mr2 = ibv_reg_mr(ctx->pd2, ctx->buf2, size, IBV_ACCESS_REMOTE_WRITE);
     if (!ctx->mr2) {
         fprintf(stderr, "Couldn't register MR2\n");
         return NULL;
@@ -495,8 +502,18 @@ int pp_close_ctx(struct pingpong_context *ctx)
         return 1;
     }
 
+    if (ibv_dereg_mr(ctx->mr2)) {
+        fprintf(stderr, "Couldn't deregister MR2\n");
+        return 1;
+    }
+
     if (ibv_dealloc_pd(ctx->pd)) {
         fprintf(stderr, "Couldn't deallocate PD\n");
+        return 1;
+    }
+
+    if (ibv_dealloc_pd(ctx->pd2)) {
+        fprintf(stderr, "Couldn't deallocate PD2\n");
         return 1;
     }
 
