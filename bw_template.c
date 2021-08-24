@@ -66,9 +66,11 @@ struct pingpong_context {
     struct ibv_comp_channel	*channel;
     struct ibv_pd		*pd;
     struct ibv_mr		*mr;
+    struct ibv_mr       *mr2;
     struct ibv_cq		*cq;
     struct ibv_qp		*qp;
     void			*buf;
+    void            *buf2;
     int				size;
     int				rx_depth;
     int				routs;
@@ -237,7 +239,7 @@ static struct pingpong_dest *pp_client_exch_dest(struct pingpong_context* ctx,
     }
 
     gid_to_wire_gid(&my_dest->gid, gid);
-    sprintf(msg, "%04x:%06x:%06x:%s:%08x:%016x", my_dest->lid, my_dest->qpn, my_dest->psn, gid, ctx->mr->rkey, (uint64_t)ctx->mr->addr);
+    sprintf(msg, "%04x:%06x:%06x:%s:%08x:%016x", my_dest->lid, my_dest->qpn, my_dest->psn, gid, ctx->mr2->rkey, (uint64_t)ctx->mr2->addr);
     if (write(sockfd, msg, sizeof msg) != sizeof msg) {
         fprintf(stderr, "Couldn't send local address\n");
         goto out;
@@ -346,7 +348,7 @@ static struct pingpong_dest *pp_server_exch_dest(struct pingpong_context *ctx,
 
 
     gid_to_wire_gid(&my_dest->gid, gid);
-    sprintf(msg, "%04x:%06x:%06x:%s:%08x:%016x", my_dest->lid, my_dest->qpn, my_dest->psn, gid, ctx->mr->rkey, (uint64_t)ctx->mr->addr);
+    sprintf(msg, "%04x:%06x:%06x:%s:%08x:%016x", my_dest->lid, my_dest->qpn, my_dest->psn, gid, ctx->mr2->rkey, (uint64_t)ctx->mr2->addr);
     if (write(connfd, msg, sizeof msg) != sizeof msg) {
         fprintf(stderr, "Couldn't send local address\n");
         free(rem_dest);
@@ -385,6 +387,14 @@ static struct pingpong_context *pp_init_ctx(struct ibv_device *ib_dev, int size,
 
     memset(ctx->buf, 0x7b + is_server, size);
 
+    ctx->buf2 = malloc(roundup(size, page_size));
+    if (!ctx->buf2) {
+        fprintf(stderr, "Couldn't allocate work buf2.\n");
+        return NULL;
+    }
+
+    memset(ctx->buf2, 0x7b + is_server, size);
+
     ctx->context = ibv_open_device(ib_dev);
     if (!ctx->context) {
         fprintf(stderr, "Couldn't get context for %s\n",
@@ -410,6 +420,12 @@ static struct pingpong_context *pp_init_ctx(struct ibv_device *ib_dev, int size,
     ctx->mr = ibv_reg_mr(ctx->pd, ctx->buf, size, IBV_ACCESS_LOCAL_WRITE);
     if (!ctx->mr) {
         fprintf(stderr, "Couldn't register MR\n");
+        return NULL;
+    }
+
+    ctx->mr2 = ibv_reg_mr(ctx->pd, ctx->buf2, size, IBV_ACCESS_REMOTE_WRITE);
+    if (!ctx->mr2) {
+        fprintf(stderr, "Couldn't register MR2\n");
         return NULL;
     }
 
