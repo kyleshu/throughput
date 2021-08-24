@@ -191,7 +191,8 @@ static int pp_connect_ctx(struct pingpong_context *ctx, int port, int my_psn,
     return 0;
 }
 
-static struct pingpong_dest *pp_client_exch_dest(const char *servername, int port,
+static struct pingpong_dest *pp_client_exch_dest(struct pingpong_context* ctx,
+                                                 const char *servername, int port,
                                                  const struct pingpong_dest *my_dest)
 {
     struct addrinfo *res, *t;
@@ -200,7 +201,7 @@ static struct pingpong_dest *pp_client_exch_dest(const char *servername, int por
             .ai_socktype = SOCK_STREAM
     };
     char *service;
-    char msg[sizeof "0000:000000:000000:00000000000000000000000000000000"];
+    char msg[sizeof "0000:000000:000000:00000000000000000000000000000000:0000000000000000:00000000000000000000000000000000"];
     int n;
     int sockfd = -1;
     struct pingpong_dest *rem_dest = NULL;
@@ -236,7 +237,7 @@ static struct pingpong_dest *pp_client_exch_dest(const char *servername, int por
     }
 
     gid_to_wire_gid(&my_dest->gid, gid);
-    sprintf(msg, "%04x:%06x:%06x:%s", my_dest->lid, my_dest->qpn, my_dest->psn, gid);
+    sprintf(msg, "%04x:%06x:%06x:%s:%08x:%016x", my_dest->lid, my_dest->qpn, my_dest->psn, gid, ctx->mr->rkey, (uint64_t)ctx->mr->addr);
     if (write(sockfd, msg, sizeof msg) != sizeof msg) {
         fprintf(stderr, "Couldn't send local address\n");
         goto out;
@@ -254,7 +255,7 @@ static struct pingpong_dest *pp_client_exch_dest(const char *servername, int por
     if (!rem_dest)
         goto out;
 
-    sscanf(msg, "%x:%x:%x:%s", &rem_dest->lid, &rem_dest->qpn, &rem_dest->psn, gid);
+    sscanf(msg, "%x:%x:%x:%s:%08x:%016x", &rem_dest->lid, &rem_dest->qpn, &rem_dest->psn, gid, &rem_dest->rkey, &rem_dest->remote_addr);
     wire_gid_to_gid(gid, &rem_dest->gid);
 
     out:
@@ -275,7 +276,7 @@ static struct pingpong_dest *pp_server_exch_dest(struct pingpong_context *ctx,
             .ai_socktype = SOCK_STREAM
     };
     char *service;
-    char msg[sizeof "0000:000000:000000:00000000000000000000000000000000"];
+    char msg[sizeof "0000:000000:000000:00000000000000000000000000000000:0000000000000000:00000000000000000000000000000000"];
     int n;
     int sockfd = -1, connfd;
     struct pingpong_dest *rem_dest = NULL;
@@ -333,7 +334,7 @@ static struct pingpong_dest *pp_server_exch_dest(struct pingpong_context *ctx,
     if (!rem_dest)
         goto out;
 
-    sscanf(msg, "%x:%x:%x:%s", &rem_dest->lid, &rem_dest->qpn, &rem_dest->psn, gid);
+    sscanf(msg, "%x:%x:%x:%s:%08x:%016x", &rem_dest->lid, &rem_dest->qpn, &rem_dest->psn, gid, &rem_dest->rkey, &rem_dest->remote_addr);
     wire_gid_to_gid(gid, &rem_dest->gid);
 
     if (pp_connect_ctx(ctx, ib_port, my_dest->psn, mtu, sl, rem_dest, sgid_idx)) {
@@ -345,7 +346,7 @@ static struct pingpong_dest *pp_server_exch_dest(struct pingpong_context *ctx,
 
 
     gid_to_wire_gid(&my_dest->gid, gid);
-    sprintf(msg, "%04x:%06x:%06x:%s", my_dest->lid, my_dest->qpn, my_dest->psn, gid);
+    sprintf(msg, "%04x:%06x:%06x:%s:%08x:%016x", my_dest->lid, my_dest->qpn, my_dest->psn, gid, ctx->mr->rkey, (uint64_t)ctx->mr->addr);
     if (write(connfd, msg, sizeof msg) != sizeof msg) {
         fprintf(stderr, "Couldn't send local address\n");
         free(rem_dest);
@@ -818,7 +819,7 @@ int main(int argc, char *argv[])
 
 
     if (servername)
-        rem_dest = pp_client_exch_dest(servername, port, &my_dest);
+        rem_dest = pp_client_exch_dest(ctx, servername, port, &my_dest);
     else
         rem_dest = pp_server_exch_dest(ctx, ib_port, mtu, port, sl, &my_dest, gidx);
 
