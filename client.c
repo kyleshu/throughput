@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 		printf("Could not create socket");
 		return -1;
 	}
-	puts("Socket created");
+	//puts("Socket created");
 
 	server.sin_addr.s_addr = inet_addr(argv[1]);
 	server.sin_family = AF_INET;
@@ -60,32 +60,41 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	puts("Connected\n");
+	//puts("Connected\n");
 
+	size_t test_size = 9 * 1024 * 1024;
+        size_t warmup_size = 1 * 1024 * 1024;
 	//Start sending data to server
 	for (msg_len = 1; msg_len < 1024 * 1024 + 1; msg_len = msg_len * 2) {
 		//Prepare dummy string
 		rand_string(message, msg_len - 1);
-		printf("The length of message : %zu\n", msg_len);
+		//printf("The length of message : %zu\n", msg_len);
+
+		//Increase load size
+		if (msg_len % 10 == 6) {
+			test_size *= 4;
+			warmup_size *= 4;
+		}
 
 		//Notify test begins
-		sprintf(signal, "%zu", msg_len);
+		sprintf(signal, "%zu", test_size + warmup_size);
 		send(sock, signal, strlen(signal) + 1, 0);
                 
-		puts("Sleep for 3 seconds");
-		sleep(3);
+		//puts("Sleep for 1 seconds");
+		sleep(1);
 
-		//Keep sending data for 11000 times, 1000 for warming up, 10000 for benchmarking
-		for (int i = 0; i < 1000; i++) {
+		//Send data, 1/10 for warming up, 9/10 for benchmark
+
+		for (size_t i = 0; i < warmup_size; i+=msg_len) {
 			if ((send_size = send(sock, message, msg_len, 0)) < 0)
 			{
 				puts("Send failed");
 				return -1;
 			}
-			//printf("Sent %ith pre-test message, size: %i\n", i+1, send_size);
+			//printf("Sent %ith warm-up message, size: %i\n", i+1, send_size);
 		}
 		gettimeofday(&start, NULL);
-		for (int i = 0; i < 10000; i++) {
+		for (size_t i = 0; i < test_size; i+=msg_len) {
 			if ((send_size = send(sock, message, msg_len, 0)) < 0)
 			{
 				puts("Send failed");
@@ -93,7 +102,7 @@ int main(int argc, char* argv[])
 			}
 			//printf("Sent %ith message, size: %i\n", i+1, send_size);
 		}
-		puts("Finished sending messages");
+		//puts("Finished sending messages");
 
 		//Receive a reply from the server
 		recv_size = recv(sock, server_reply, 100, 0);
@@ -102,12 +111,13 @@ int main(int argc, char* argv[])
 		}
 		if (strcmp(server_reply, "OK") == 0) {
 			gettimeofday(&stop, NULL);
-			printf("took %lu us\n", (stop.tv_sec - start.tv_sec) * 1000000 + (stop.tv_usec - start.tv_usec));
+			//printf("took %lu us\n", (stop.tv_sec - start.tv_sec) * 1000000 + (stop.tv_usec - start.tv_usec));
+			float total_size = (test_size / 1024) / (float) 1024;
+			float time = (stop.tv_sec - start.tv_sec) + (stop.tv_usec - start.tv_usec) / (float) 1000000;
+			printf("%zu   %.4f  MB/s\n", msg_len, total_size/time);
 		} else {
 			puts(server_reply);
 		}
-		puts("Sleep for 3 seconds");
-		sleep(3);
 	}
 
 	close(sock);

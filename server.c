@@ -12,13 +12,14 @@
 
 int main(int argc, char* argv[])
 {
-	int socket_desc, client_sock, c, read_size;
+	int socket_desc, client_sock, c;
 	struct sockaddr_in server, client;
 	char reply[100] = "OK";
 	char signal[100];
-	size_t buf_size;
+	size_t buf_size; 
+	ssize_t read_size;
 
-	char* client_message = malloc(11000 * (1024 * 1024 * sizeof(char)));
+	char* client_message = malloc(1024 * (1024 * 1024 * sizeof(char)));
 
 	if (client_message == NULL) {
 		puts("failed to allocate memory");
@@ -69,10 +70,10 @@ int main(int argc, char* argv[])
 	{
 		//Check signal
 		sscanf(signal, "%zu", &buf_size);
-		printf("Starting message size: %zu\n", buf_size);
+		printf("Total size: %zu\n", buf_size);
 
-		//Receive 11000 copies of data
-		size_t remaining = buf_size * 11000;
+		//Receive data
+		size_t remaining = buf_size;
 		char* p = client_message;
 		while (remaining > 0) {
 			read_size = recv(client_sock, p, remaining, 0);
@@ -81,11 +82,11 @@ int main(int argc, char* argv[])
 				return -1;
 			}
 			remaining -= read_size;
-			p += read_size;
+			//p += read_size;
 			//printf("Remaining size: %i\n", remaining);
 			//printf("Read size: %i\n", read_size);
 		}
-		puts("Processed 11000 messages");
+		puts("Processed all messages");
 		
 		//Send the message back to client
 		send(client_sock, reply, strlen(reply) + 1, 0);
