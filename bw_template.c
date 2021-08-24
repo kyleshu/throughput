@@ -55,6 +55,7 @@
 enum {
     PINGPONG_RECV_WRID = 1,
     PINGPONG_SEND_WRID = 2,
+    PINGPONG_WRITE_WRID = 3,
 };
 
 static int page_size;
@@ -78,6 +79,8 @@ struct pingpong_dest {
     int lid;
     int qpn;
     int psn;
+    uint64_t remote_addr;
+    uint32_t rkey;
     union ibv_gid gid;
 };
 
@@ -521,7 +524,7 @@ static int pp_post_recv(struct pingpong_context *ctx, int n)
     return i;
 }
 
-static int pp_post_send(struct pingpong_context *ctx)
+static int pp_post_send(struct pingpong_context *ctx, struct pingpong_dest *rdest)
 {
     struct ibv_sge list = {
             .addr	= (uint64_t)ctx->buf,
@@ -536,6 +539,28 @@ static int pp_post_send(struct pingpong_context *ctx)
             .opcode     = IBV_WR_SEND,
             .send_flags = IBV_SEND_SIGNALED,
             .next       = NULL
+    };
+
+    return ibv_post_send(ctx->qp, &wr, &bad_wr);
+}
+
+static int pp_post_write(struct pingpong_context* ctx, struct pingpong_dest* rdest, unsigned int send_flags)
+{
+    struct ibv_sge list = {
+            .addr = (uint64_t)ctx->buf,
+            .length = ctx->size,
+            .lkey = ctx->mr->lkey
+    };
+
+    struct ibv_send_wr* bad_wr, wr = {
+            .wr_id = PINGPONG_WRITE_WRID,
+            .sg_list = &list,
+            .num_sge = 1,
+            .opcode = IBV_WR_RDMA_WRITE,
+            .send_flags = send_flags,
+            .next = NULL,
+            .wr.rdma.remote_addr = rdest->remote_addr,
+            .wr.rdma.rkey = rdest->rkey
     };
 
     return ibv_post_send(ctx->qp, &wr, &bad_wr);
@@ -819,14 +844,14 @@ int main(int argc, char *argv[])
             if ((i != 0) && (i % tx_depth == 0)) {
                 pp_wait_completions(ctx, tx_depth);
             }
-            if (pp_post_send(ctx)) {
-                fprintf(stderr, "Client ouldn't post send\n");
+            if (pp_post_send(ctx, rem_dest)) {
+                fprintf(stderr, "Client couldn't post send\n");
                 return 1;
             }
         }
         printf("Client Done.\n");
     } else {
-        if (pp_post_send(ctx)) {
+        if (pp_post_send(ctx, rem_dest)) {
             fprintf(stderr, "Server couldn't post send\n");
             return 1;
         }
