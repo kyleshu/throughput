@@ -12,7 +12,7 @@
 
 static char* rand_string(char* str, size_t size)
 {
-	const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJK...";
+	const char charset[] = "abcdefghijklmnopqrstuvwxyz0123456789";
 	if (size) {
 		for (size_t n = 0; n < size; n++) {
 			int key = rand() % (int)(sizeof charset - 1);
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 	int sock, send_size, recv_size;
 	struct sockaddr_in server;
 	struct timeval stop, start;
-	char message[1024*1024+1], server_reply[100], signal[100];
+	char message[1024*1024], server_reply[100], signal[100];
 	size_t msg_len;
 
 	if (argc > 2) {
@@ -71,9 +71,12 @@ int main(int argc, char* argv[])
 		//Notify test begins
 		sprintf(signal, "%zu", msg_len);
 		send(sock, signal, strlen(signal) + 1, 0);
+                
+		puts("Sleep for 3 seconds");
+		sleep(3);
 
-		//Keep sending data for 1100 times, 100 for warming up, 1000 for benchmarking
-		for (int i = 0; i < 100; i++) {
+		//Keep sending data for 11000 times, 1000 for warming up, 10000 for benchmarking
+		for (int i = 0; i < 1000; i++) {
 			if ((send_size = send(sock, message, msg_len, 0)) < 0)
 			{
 				puts("Send failed");
@@ -82,7 +85,7 @@ int main(int argc, char* argv[])
 			//printf("Sent %ith pre-test message, size: %i\n", i+1, send_size);
 		}
 		gettimeofday(&start, NULL);
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			if ((send_size = send(sock, message, msg_len, 0)) < 0)
 			{
 				puts("Send failed");
@@ -90,6 +93,7 @@ int main(int argc, char* argv[])
 			}
 			//printf("Sent %ith message, size: %i\n", i+1, send_size);
 		}
+		puts("Finished sending messages");
 
 		//Receive a reply from the server
 		recv_size = recv(sock, server_reply, 100, 0);
@@ -98,10 +102,12 @@ int main(int argc, char* argv[])
 		}
 		if (strcmp(server_reply, "OK") == 0) {
 			gettimeofday(&stop, NULL);
-			printf("took %lu ms\n", (stop.tv_sec - start.tv_sec) * 1000 + (stop.tv_usec - start.tv_usec) / 1000);
+			printf("took %lu us\n", (stop.tv_sec - start.tv_sec) * 1000000 + (stop.tv_usec - start.tv_usec));
+		} else {
+			puts(server_reply);
 		}
-		puts("Sleep for 10 seconds");
-		sleep(10);
+		puts("Sleep for 3 seconds");
+		sleep(3);
 	}
 
 	close(sock);
