@@ -620,8 +620,8 @@ int main(int argc, char *argv[])
     struct pingpong_context *ctx;
     struct pingpong_dest     my_dest;
     struct pingpong_dest    *rem_dest;
-    char                    *ib_devname = NULL;
-    char                    *servername = NULL;
+    char                    *ib_devname = NULL; 
+    char                    *servername = NULL; 
     int                      port = 12345;
     int                      ib_port = 1;
     enum ibv_mtu             mtu = IBV_MTU_2048;
