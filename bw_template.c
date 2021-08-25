@@ -394,7 +394,7 @@ static struct pingpong_context *pp_init_ctx(struct ibv_device *ib_dev, int size,
         return NULL;
     }
 
-    memset(ctx->buf2, 0x7c, size);
+    memset(ctx->buf2, 0, size);
 
     ctx->context = ibv_open_device(ib_dev);
     if (!ctx->context) {
@@ -640,6 +640,10 @@ int pp_wait_completions(struct pingpong_context *ctx, int iters)
                     }
                 }
                 ++rcnt;
+                break;
+
+            case PINGPONG_WRITE_WRID:// TODO
+                ++scnt;
                 break;
 
             default:
