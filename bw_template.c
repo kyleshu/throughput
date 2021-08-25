@@ -430,7 +430,7 @@ static struct pingpong_context *pp_init_ctx(struct ibv_device *ib_dev, int size,
         return NULL;
     }
 
-    ctx->mr2 = ibv_reg_mr(ctx->pd2, ctx->buf2, size, IBV_ACCESS_REMOTE_WRITE);
+    ctx->mr2 = ibv_reg_mr(ctx->pd2, ctx->buf2, size, IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_LOCAL_WRITE);
     if (!ctx->mr2) {
         fprintf(stderr, "Couldn't register MR2\n");
         perror("register MR2 failed");
