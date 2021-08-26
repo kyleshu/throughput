@@ -70,7 +70,10 @@ int main(int argc, char* argv[])
 		rand_string(message, msg_len - 1);
 		//printf("The length of message : %zu\n", msg_len);
 
-		//Increase load size
+		//Increase load size 
+		//NOTE: we want to do relatively fixed test time rather than fixed number of iterations
+		//But we can't use time, because then server doesn't know how many messages are expected
+		//So we start with a smaller total size (because throughputs of small messages are very low), and slowly increase it
 		if (msg_len % 10 == 6) {
 			test_size *= 2;
 			warmup_size *= 2;
