@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
 
 		//Increase load size
 		if (msg_len % 10 == 6) {
-			test_size *= 4;
-			warmup_size *= 4;
+			test_size *= 2;
+			warmup_size *= 2;
 		}
 
 		//Notify test begins
